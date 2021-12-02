@@ -14,12 +14,13 @@ function JoinBlock({onLogin}) {
     if(!roomId || !userName) {
       return alert('Incorrect data')
     }
-    setLoading(true)
-    axios.post('/rooms', {
+    const obj = {
       roomId,
       userName
-    }).then(() => {
-      onLogin()
+    }
+    setLoading(true)
+    axios.post('/rooms', obj).then(() => {
+      onLogin(obj)
     })
   }
     return (
@@ -39,7 +40,7 @@ function JoinBlock({onLogin}) {
         disabled={isLoading}
         onClick={onEnter} 
         variant="success">
-          {isLoading ? 'CONNECTION' : 'SIGN IN'}</Button>
+          {isLoading ? 'CONNECTION..' : 'SIGN IN'}</Button>
       </div>
     );
 }
