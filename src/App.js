@@ -1,3 +1,4 @@
+
 import React from "react";
 import socket from "./socket";
 
@@ -25,12 +26,23 @@ function App() {
     })
     socket.emit('ROOM:JOIN', obj)
   }
-  
-  React.useEffect(() => {
-    socket.on('ROOM:JOINED', (users) =>dispatch({
+
+  const setUsers = (users) => {
+    dispatch({
       type: 'SET_USERS',
       payload: users
-    }))
+    })
+  }
+  
+  React.useEffect(() => {
+    socket.on('ROOM:JOINED', setUsers)
+    socket.on('ROOM:SET_USERS', setUsers)
+    socket.on('ROOM:NEW_MESSAGE', message => {
+      dispatch({
+        type: 'NEW_MESSAGE',
+        payload: message
+      })
+    })
   }, [])
 
   return (

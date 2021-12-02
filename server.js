@@ -31,10 +31,27 @@ io.on('connection', socket => {
         socket.join(data.roomId)
         rooms.get(data.roomId).get('users').set(socket.id, data.userName)
         const users = rooms.get(data.roomId).get('users').values()
-        socket.broadcast.to(data.roomId).emit('ROOM:JOINED', [...users])
+        io.in(data.roomId).emit('ROOM:JOINED', [...users])
     })
-    console.log('user connected', socket.id)
+    socket.on('ROOM:NEW_MESSAGE', ({roomId, userName, text}) => {
+        const obj = {
+            userName,
+            text,
+         }
+        rooms.get(roomId).get('messages').push(obj)
+        io.in(roomId).emit('ROOM:NEW_MESSAGE', obj)
+    })
+    socket.on('disconnect', () => {
+        rooms.forEach((value, index) => {
+            if(value.get('users').delete(socket.id)) {
+                const users = rooms.get(index).get('users').values()
+                io.in(index).emit('ROOM:SET_USERS', [...users])
+            }
+        })
+    })
 })
+
+
 
 server.listen(8888, (err) => {
     if(err) {
