@@ -27,19 +27,21 @@ app.post('/rooms', (req, res) => {
 })
 
 io.on('connection', socket => {
-    socket.on('ROOM:JOIN', (data) => {
-        socket.join(data.roomId)
-        rooms.get(data.roomId).get('users').set(socket.id, data.userName)
-        const users = rooms.get(data.roomId).get('users').values()
-        io.in(data.roomId).emit('ROOM:JOINED', [...users])
+    socket.on('ROOM:JOIN', ({roomId, userName}) => {
+        socket.join(roomId)
+        rooms.get(roomId).get('users').set(socket.id, userName)
+        const users = rooms.get(roomId).get('users').values()
+        io.in(roomId).emit('ROOM:JOINED', [...users])
     })
-    socket.on('ROOM:NEW_MESSAGE', ({roomId, userName, text}) => {
+    socket.on('ROOM:NEW_MESSAGE', ({roomId, userName, text, date}) => {
         const obj = {
             userName,
             text,
+            date
          }
         rooms.get(roomId).get('messages').push(obj)
         io.in(roomId).emit('ROOM:NEW_MESSAGE', obj)
+        console.log(rooms)
     })
     socket.on('disconnect', () => {
         rooms.forEach((value, index) => {

@@ -10,7 +10,7 @@ function JoinBlock({onLogin}) {
   const [userName, setUserName] = React.useState('')
   const [isLoading, setLoading] = React.useState(false)
 
-  const onEnter = () => {
+  const onEnter = async () => {
     if(!roomId || !userName) {
       return alert('Incorrect data')
     }
@@ -19,23 +19,25 @@ function JoinBlock({onLogin}) {
       userName
     }
     setLoading(true)
-    axios.post('/rooms', obj).then(() => {
-      onLogin(obj)
-    })
+    await axios.post('/rooms', obj)
+    onLogin(obj)
   }
     return (
       <div className="join-block">
-        <h1>Bizzy Chat</h1>
+        <img src="/img/like.png" alt="login" height={100} width={100}/>
+        <h1 className="join-block_title">Liker Chat</h1>
         <Form.Control 
         type="text" 
         placeholder="Room ID" 
         value={roomId}
-        onChange={e => setRoomId(e.target.value)}/>
+        onChange={e => setRoomId(e.target.value)}
+        maxLength={10}/>
         <Form.Control 
         type="text" 
         placeholder="Type ur name" 
         value={userName}
-        onChange={e => setUserName(e.target.value)}/>
+        onChange={e => setUserName(e.target.value)}
+        maxLength={14}/>
         <Button
         disabled={isLoading}
         onClick={onEnter} 
